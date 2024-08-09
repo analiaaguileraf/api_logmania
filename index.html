@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtro de Logs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Logs del Sistema</h1>
+    <form id="filter-form">
+        <label for="fecha_hora_inicio">Fecha y hora de inicio del servicio:</label>
+        <input type="datetime-local" id="fecha_hora_inicio" name="fecha_hora_inicio">
+
+        <label for="fecha_hora_fin">Fecha y hora del fin del servicio:</label>
+        <input type="datetime-local" id="fecha_hora_fin" name="fecha_hora_fin">
+
+        <label for="received_at_inicio">Fecha y hora de recepcion del servicio:</label>
+        <input type="datetime-local" id="received_at_inicio" name="received_at_inicio">
+
+        <label for="received_at_fin">Fecha del fin de recepcion:</label>
+        <input type="datetime-local" id="received_at_fin" name="received_at_fin">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <div id="logs-container"></div>
+
+    <script>
+        document.getElementById('filter-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const params = new URLSearchParams(new FormData(event.target)).toString();
+            const response = await fetch(`/logs?${params}`);
+            const data = await response.json();
+
+            const logsContainer = document.getElementById('logs-container');
+            logsContainer.innerHTML = '';
+
+            data.logs.forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                logItem.innerHTML = `
+                    <p><strong>Fecha y hora:</strong> ${log[1]}</p>
+                    <p><strong>Nombre del servicio:</strong> ${log[2]}</p>
+                    <p><strong>Nivel de severidad:</strong> ${log[3]}</p>
+                    <p><strong>Mensaje:</strong> ${log[4]}</p>
+                    <p><strong>Recibido a las:</strong> ${log[5]}</p>
+                `;
+                logsContainer.appendChild(logItem);
+            });
+        });
+    </script>
+</body>
+</html>
